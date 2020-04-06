@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: knp-hello-go-app
+  name: knp-hello-go-deploy-namespace-a
+  namespace: namespace-a 
+spec:
+  ports:
+  - nodePort: 30050
+    port: 8180
+    protocol: TCP
+    targetPort: 8180
+  selector:
+    app: knp-hello-go-app
+  type: NodePort
