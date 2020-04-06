@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: knp-hello-go-app
+    app: knp-hello-go-app                # that app is under Deployment in default NS
   name: knp-hello-go-deploy-namespace-a
   namespace: namespace-a 
 spec:
