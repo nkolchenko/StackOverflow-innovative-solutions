@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-go
+  labels:
+    app: server-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server-go
+  template:
+    metadata:
+      labels:
+        app: server-go
+    spec:
+      containers:
+        - name: server-go
+          imagePullPolicy: IfNotPresent
+          image: nkolchenko/enea:server_go_latest
+          ports:
+            - containerPort: 8180
