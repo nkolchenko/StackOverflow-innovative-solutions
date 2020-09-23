@@ -1,0 +1,121 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+  creationTimestamp: "2020-08-20T15:09:41Z"
+  generation: 2
+  labels:
+    app: jenkins
+  name: jenkins-uat
+  namespace: default
+  resourceVersion: "79***16"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/jenkins-uat
+  uid: 65****7b
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: jenkins
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - env:
+        - name: JENKINS_USERNAME
+          value: hlpjenkin
+        - name: JENKINS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: jnkns-password
+              name: jnkns-secret
+        - name: JENKINS_HOME
+          value: /var/jenkins_home
+        - name: DISABLE_JENKINS_INITIALIZATION
+          value: "no"
+        image: jenkins/jenkins:lts
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /login
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: jenkins
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8443
+          name: https
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /login
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          requests:
+            cpu: 300m
+            memory: 512Mi
+        securityContext:
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: docker-sock
+        - mountPath: /var/jenkins_home
+          name: jenkins-data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /var/run/docker.sock
+          type: File
+        name: docker-sock
+      - name: jenkins-data
+        persistentVolumeClaim:
+          claimName: jenkins-pvc
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2020-08-20T15:10:13Z"
+    lastUpdateTime: "2020-08-20T15:10:13Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2020-08-20T15:09:41Z"
+    lastUpdateTime: "2020-08-20T15:33:23Z"
+    message: ReplicaSet "jenkins-uat-79****b8" is progressing.
+    reason: ReplicaSetUpdated
+    status: "True"
+    type: Progressing
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 2
+  unavailableReplicas: 1
+  updatedReplicas: 1
